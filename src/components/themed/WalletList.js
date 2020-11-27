@@ -26,7 +26,8 @@ const DIVIDE_PRECISION = 18
 
 type OwnProps = {
   header?: React.Node,
-  footer?: React.Node
+  footer?: React.Node,
+  showSlidingTutorial?: boolean
 }
 
 type StateProps = {
@@ -129,7 +130,7 @@ class WalletListComponent extends React.PureComponent<Props> {
   }
 
   renderRow = (data: FlatListItem<WalletListItem>, rowMap: { [string]: SwipeRow }) => {
-    const { exchangeRates, settings, showBalance, theme, wallets } = this.props
+    const { exchangeRates, settings, showBalance, showSlidingTutorial, theme, wallets } = this.props
     const walletId = data.item.id
     const guiWallet = wallets[walletId]
 
@@ -210,6 +211,7 @@ class WalletListComponent extends React.PureComponent<Props> {
           rowMap={rowMap}
           selectWallet={this.props.selectWallet}
           symbolImage={symbolImage}
+          showSlidingTutorial={data.index === 0 && showSlidingTutorial}
           walletId={walletId}
           walletName={guiWallet.name}
           walletProgress={walletProgress}

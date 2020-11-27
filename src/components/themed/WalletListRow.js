@@ -17,6 +17,7 @@ import { EdgeText } from './EdgeText.js'
 const WIDTH_DIMENSION_ACTIVATE = Dimensions.get('window').width * 0.75
 const WIDTH_DIMENSION_HIDE = Dimensions.get('window').width * 0.4
 const WIDTH_DIMENSION_SHOW = Dimensions.get('window').width * 0.15
+const OPEN_VALUE = 6.25
 
 type Props = {
   cryptoAmount: string,
@@ -30,6 +31,7 @@ type Props = {
   isToken: boolean,
   rowKey: string,
   publicAddress: string,
+  showSlidingTutorial: boolean,
   selectWallet(walletId: string, currencyCode: string): void,
   symbolImage?: string,
   walletId: string,
@@ -40,14 +42,24 @@ type Props = {
 }
 
 type State = {
-  swipeDirection: 'left' | 'right' | null
+  swipeDirection: 'left' | 'right' | null,
+  shownSlidingTutorial: boolean
 }
 
 class WalletListRowComponent extends React.PureComponent<Props & ThemeProps, State> {
   constructor(props) {
     super(props)
     this.state = {
-      swipeDirection: null
+      swipeDirection: null,
+      shownSlidingTutorial: false
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.showSlidingTutorial && !this.state.shownSlidingTutorial) {
+      const { rowKey, rowMap, theme } = this.props
+      rowMap[rowKey].manuallySwipeRow(theme.rem(-OPEN_VALUE))
+      this.setState({ shownSlidingTutorial: true })
     }
   }
 
@@ -130,8 +142,8 @@ class WalletListRowComponent extends React.PureComponent<Props & ThemeProps, Sta
       <SwipeRow
         onRowOpen={this.handleRowOpen}
         onSwipeValueChange={this.handleSwipeValueChange}
-        leftOpenValue={theme.rem(6.25)}
-        rightOpenValue={theme.rem(-6.25)}
+        leftOpenValue={theme.rem(OPEN_VALUE)}
+        rightOpenValue={theme.rem(-OPEN_VALUE)}
         ref={this.props.swipeRef}
         leftActivationValue={WIDTH_DIMENSION_ACTIVATE}
         rightActivationValue={-WIDTH_DIMENSION_ACTIVATE}
