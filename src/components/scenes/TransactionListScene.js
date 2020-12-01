@@ -2,16 +2,14 @@
 
 import type { EdgeDenomination, EdgeTransaction } from 'edge-core-js'
 import * as React from 'react'
-import { ActivityIndicator, Alert, FlatList, View } from 'react-native'
+import { ActivityIndicator, Alert, FlatList } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 
 import TransactionRow from '../../connectors/TransactionRowConnector.js'
 import s from '../../locales/strings.js'
 import type { ContactsState } from '../../reducers/ContactsReducer'
-import { THEME } from '../../theme/variables/airbitz.js'
 import type { GuiWallet, TransactionListTx } from '../../types/types.js'
-import { scale } from '../../util/scaling.js'
-import BuyCrypto from '../common/BuyCrypto.js'
+import { BuyCrypto } from '../common/BuyCrypto.js'
 import { SceneWrapper } from '../common/SceneWrapper.js'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
 import { TransactionListHeader } from '../themed/TransactionListHeader.js'
@@ -30,8 +28,7 @@ export type StateProps = {
   uiWallet: GuiWallet,
   contacts: ContactsState,
   fiatSymbol: string,
-  requiredConfirmations?: number,
-  numTransactions: number
+  requiredConfirmations?: number
 }
 
 export type DispatchProps = {
@@ -78,43 +75,13 @@ class TransactionListComponent extends React.Component<Props, State> {
     }
   }
 
-  renderBuyCrypto = () => {
-    const wallet = this.props.uiWallet
-    const { selectedCurrencyCode, theme } = this.props
-    const styles = getStyles(theme)
-    if (this.props.numTransactions) {
-      return (
-        <View style={styles.emptyListLoader}>
-          <ActivityIndicator size="large" />
-        </View>
-      )
-    }
-
-    switch (selectedCurrencyCode) {
-      case 'BTC':
-        return <BuyCrypto wallet={wallet} />
-      case 'BCH':
-        return <BuyCrypto wallet={wallet} />
-      case 'ETH':
-        return <BuyCrypto wallet={wallet} />
-      case 'LTC':
-        return <BuyCrypto wallet={wallet} />
-      case 'XRP':
-        return <BuyCrypto wallet={wallet} />
-      case 'BSV':
-        return <BuyCrypto wallet={wallet} />
-      default:
-        return null
-    }
-  }
-
   render() {
     const txs = this.state.reset ? emptyArray : this.props.transactions
     const styles = getStyles(this.props.theme)
     return (
-      <SceneWrapper bodySplit={200}>
+      <SceneWrapper>
         <FlatList
-          ListEmptyComponent={this.renderBuyCrypto()}
+          ListEmptyComponent={<BuyCrypto />}
           ListHeaderComponent={this.renderHeader()}
           style={styles.transactionsScrollWrap}
           data={txs}
@@ -162,13 +129,6 @@ class TransactionListComponent extends React.Component<Props, State> {
 const getStyles = cacheStyles((theme: Theme) => ({
   transactionsScrollWrap: {
     flex: 1
-  },
-  emptyListLoader: {
-    backgroundColor: THEME.COLORS.GRAY_4,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: scale(230)
   }
 }))
 
