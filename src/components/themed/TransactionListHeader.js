@@ -6,23 +6,21 @@ import { Image, TouchableOpacity, View } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { connect } from 'react-redux'
-import { sprintf } from 'sprintf-js'
 
 import { toggleAccountBalanceVisibility } from '../../actions/WalletListActions.js'
 import credLogo from '../../assets/images/cred_logo.png'
-import * as Constants from '../../constants/indexConstants.js'
+import { getSpecialCurrencyInfo } from '../../constants/indexConstants.js'
 import { guiPlugins } from '../../constants/plugins/GuiPlugins.js'
 import * as intl from '../../locales/intl.js'
 import s from '../../locales/strings.js'
-import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
-import { convertCurrency, getSelectedWalletLoadingPercent } from '../../modules/UI/selectors.js'
+import { convertCurrency } from '../../modules/UI/selectors.js'
 import { THEME } from '../../theme/variables/airbitz.js'
 import { type Dispatch, type RootState } from '../../types/reduxTypes.js'
 import { scale } from '../../util/scaling.js'
 import { convertNativeToDenomination, decimalOrZero, getDefaultDenomination, getDenomination, getFiatSymbol } from '../../util/utils'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
-import { WiredProgressBar } from '../themed/WiredProgressBar.js'
 import { EdgeText } from './EdgeText.js'
+import { ButtonBox } from './ThemedButtons.js'
 
 export type StateProps = {
   cryptoAmount: string,
@@ -43,7 +41,23 @@ export type DispatchProps = {
 
 type Props = StateProps & DispatchProps & ThemeProps
 
-class TransactionListHeaderComponent extends React.Component<Props> {
+class TransactionListHeaderComponent extends React.PureComponent<Props> {
+  renderEarnInterestCard = () => {
+    const { currencyCode, transactionsLength, theme } = this.props
+    const styles = getStyles(theme)
+
+    if (transactionsLength !== 0 && getSpecialCurrencyInfo(currencyCode).showEarnInterestCard) {
+      return (
+        <ButtonBox onPress={() => Actions.pluginEarnInterest({ plugin: guiPlugins.cred })} paddingRem={0}>
+          <View style={styles.earnInterestContainer}>
+            <Image style={styles.earnInterestImage} source={credLogo} resizeMode="contain" />
+            <EdgeText style={styles.earnInterestText}>{s.strings.earn_interest}</EdgeText>
+          </View>
+        </ButtonBox>
+      )
+    }
+  }
+
   renderHeader = () => {
     const {
       cryptoAmount,
@@ -76,7 +90,7 @@ class TransactionListHeaderComponent extends React.Component<Props> {
   }
 
   render() {
-    const { currencyCode, currencyName, transactionsLength, theme } = this.props
+    const { theme } = this.props
     const styles = getStyles(theme)
 
     return (
@@ -93,15 +107,7 @@ class TransactionListHeaderComponent extends React.Component<Props> {
             <View style={styles.buttonsIcon} />
           </TouchableOpacity>
         </View>
-        <WiredProgressBar progress={getSelectedWalletLoadingPercent} />
-        {transactionsLength !== 0 && Constants.getSpecialCurrencyInfo(currencyCode).showEarnInterestCard && (
-          <TouchableOpacity onPress={() => Actions[Constants.PLUGIN_EARN_INTEREST]({ plugin: guiPlugins.cred })} style={styles.earnInterestContainer}>
-            <View style={styles.earnInterestBox}>
-              <Image style={styles.earnInterestImage} source={credLogo} resizeMode="contain" />
-              <T style={styles.earnInterestText}>{sprintf(s.strings.earn_interest_on, currencyName)}</T>
-            </View>
-          </TouchableOpacity>
-        )}
+        {this.renderEarnInterestCard()}
       </View>
     )
   }
@@ -109,11 +115,13 @@ class TransactionListHeaderComponent extends React.Component<Props> {
 
 const getStyles = cacheStyles((theme: Theme) => ({
   container: {
-    flex: 1
+    flex: 1,
+    padding: theme.rem(1)
   },
+
+  // Balance Box
   headerContainer: {
     height: theme.rem(5),
-    padding: theme.rem(0.75),
     justifyContent: 'center'
   },
   currencyText: {
@@ -127,15 +135,12 @@ const getStyles = cacheStyles((theme: Theme) => ({
   showBalanceText: {
     fontSize: theme.rem(1.75)
   },
+
+  // Send/Receive Buttons
   buttonsContainer: {
     flex: 1,
     flexDirection: 'row',
-    paddingBottom: theme.rem(0.75),
-    paddingHorizontal: theme.rem(2)
-  },
-  buttons: {
-    justifyContent: 'center',
-    alignItems: 'center'
+    paddingHorizontal: theme.rem(1)
   },
   buttonsIcon: {
     top: theme.rem(-1),
@@ -149,44 +154,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
   spacer: {
     flex: 1
   },
-  requestSendRow: {
-    // two
-    height: scale(50),
-    flexDirection: 'row'
-  },
-  button: {
-    borderRadius: scale(3)
-  },
-  requestBox: {
-    backgroundColor: `${THEME.COLORS.WHITE}${THEME.ALPHA.LOW}`,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: scale(8),
-    marginRight: scale(2),
-    flexDirection: 'row',
-    borderColor: THEME.COLORS.GRAY_4
-    // borderWidth: 0.1,
-  },
-  requestWrap: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  sendBox: {
-    backgroundColor: `${THEME.COLORS.WHITE}${THEME.ALPHA.LOW}`,
-    // opacity: THEME.OPACITY.MID,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: scale(2),
-    marginRight: scale(8),
-    flexDirection: 'row',
-    borderColor: THEME.COLORS.GRAY_4
-    // borderWidth: 0.1,
-  },
-  sendWrap: {
-    flexDirection: 'row',
+  buttons: {
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -201,37 +169,21 @@ const getStyles = cacheStyles((theme: Theme) => ({
     marginHorizontal: scale(12)
   },
 
-  // beginning of second half
-  symbol: {
-    fontFamily: THEME.FONTS.SYMBOLS
-  },
-
-  // Interest:
+  // Earn Interest Card
   earnInterestContainer: {
-    backgroundColor: THEME.COLORS.GRAY_4,
-    flexDirection: 'column',
-    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
-    padding: scale(15),
-    marginBottom: 0
-  },
-  earnInterestBox: {
-    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    backgroundColor: THEME.COLORS.WHITE,
-    padding: scale(15)
+    height: theme.rem(6),
+    backgroundColor: theme.tileBackground
   },
   earnInterestImage: {
-    width: scale(32),
-    height: scale(32),
-    marginHorizontal: scale(4)
+    width: theme.rem(2.5),
+    height: theme.rem(2.5),
+    padding: theme.rem(1)
   },
   earnInterestText: {
-    marginTop: scale(10),
-    fontSize: scale(17),
-    color: THEME.COLORS.GRAY_1
+    fontFamily: theme.fontFaceBold
   }
 }))
 
