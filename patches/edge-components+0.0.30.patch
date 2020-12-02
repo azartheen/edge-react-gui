@@ -1,0 +1,89 @@
+diff --git a/node_modules/edge-components/src/FormField/FormField.js b/node_modules/edge-components/src/FormField/FormField.js
+index 6bc65a0..170fea1 100644
+--- a/node_modules/edge-components/src/FormField/FormField.js
++++ b/node_modules/edge-components/src/FormField/FormField.js
+@@ -15,8 +15,8 @@ type Props = {
+   autoCapitalize?: string,
+   secureTextEntry?: boolean,
+   showSecureCheckbox?: boolean,
+-  keyboardType?: string,
+-  returnKeyType: string,
++  keyboardType?: 'default' | 'number-pad' | 'decimal-pad' | 'numeric' | 'email-address' | 'phone-pad',
++  returnKeyType: 'done' | 'go' | 'next' | 'search' | 'send',
+   inputAccessoryViewID?: string,
+   error?: string,
+   onFinish?: () => void,
+diff --git a/node_modules/edge-components/src/FormField/Input.js b/node_modules/edge-components/src/FormField/Input.js
+index f793b4d..389e356 100644
+--- a/node_modules/edge-components/src/FormField/Input.js
++++ b/node_modules/edge-components/src/FormField/Input.js
+@@ -16,13 +16,13 @@ type Props = {
+   errorColor: string,
+   titleTextStyle: Object,
+   secureTextEntry: boolean,
+-  autoCapitalize: string,
++  autoCapitalize: 'none' | 'sentences' | 'words' | 'characters',
+   autoCorrect: boolean,
+   autoFocus: boolean,
+   forceFocus: boolean,
+-  returnKeyType: string,
++  returnKeyType: 'done' | 'go' | 'next' | 'search' | 'send',
+   inputContainerStyle: Object,
+-  keyboardType?: string,
++  keyboardType?: 'default' | 'number-pad' | 'decimal-pad' | 'numeric' | 'email-address' | 'phone-pad',
+   inputAccessoryViewID?: string,
+   onFocus(): void,
+   onBlur(): void,
+@@ -113,7 +113,7 @@ class Input extends Component<Props, State> {
+     )
+   }
+ 
+-  addRef = (arg: TextField) => {
++  addRef = (arg: TextField | null) => {
+     if (arg) {
+       this.textInput = arg
+     }
+diff --git a/node_modules/edge-components/src/Modals/InputModal/InputModal.js b/node_modules/edge-components/src/Modals/InputModal/InputModal.js
+index e8693c5..f29cdd4 100644
+--- a/node_modules/edge-components/src/Modals/InputModal/InputModal.js
++++ b/node_modules/edge-components/src/Modals/InputModal/InputModal.js
+@@ -172,14 +172,14 @@ export class Row extends Component<RowProps> {
+ type InputModalProps = {
+   isActive?: boolean,
+   style?: StyleSheet.Styles,
+-  input: {
++  input: {|
+     label: string,
+     autoCorrect?: boolean,
+-    returnKeyType: string,
++    returnKeyType: 'done' | 'go' | 'next' | 'search' | 'send',
+     initialValue?: string,
+     autoFocus?: boolean,
+-    keyboardType?: string
+-  },
++    keyboardType?: 'default' | 'number-pad' | 'decimal-pad' | 'numeric' | 'email-address' | 'phone-pad',
++  |},
+   yesButton: {
+     title: string
+   },
+diff --git a/node_modules/edge-components/src/Modals/SecureTextModal/SecureTextModal.js b/node_modules/edge-components/src/Modals/SecureTextModal/SecureTextModal.js
+index c36e40d..9534cd7 100644
+--- a/node_modules/edge-components/src/Modals/SecureTextModal/SecureTextModal.js
++++ b/node_modules/edge-components/src/Modals/SecureTextModal/SecureTextModal.js
+@@ -172,13 +172,13 @@ export class Row extends Component<RowProps> {
+ type SecureTextModalProps = {
+   isActive?: boolean,
+   style?: StyleSheet.Styles,
+-  input: {
++  input: {|
+     label: string,
+     autoCorrect?: boolean,
+-    returnKeyType: string,
++    returnKeyType: 'done' | 'go' | 'next' | 'search' | 'send',
+     initialValue?: string,
+     autoFocus?: boolean
+-  },
++  |},
+   yesButton: {
+     title: string
+   },
